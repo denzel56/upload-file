@@ -7,6 +7,7 @@ function App() {
     <div className='App'>
       <h1>Upload File</h1>
       <UploadFile
+        onFinish={(files) => console.log('>>> fin', files)}
         multiple
       />
     </div>
