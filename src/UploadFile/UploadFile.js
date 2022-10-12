@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import PropTypes from 'prop-types';
 import cn from 'classnames';
@@ -28,8 +28,10 @@ const formatSize = (size) => {
 }
 
 const UploadFile = ({ multiple, onFinish }) => {
+  const inputRef = useRef(null);
   const [files, setFiles] = useState([]);
   const isFinish = useMemo(() => Object.keys(files).length > 0 ? Object.values(files).every(item => item.isLoading === false) : false, [files]);
+
 
   useEffect(() => {
     if (isFinish) {
@@ -45,7 +47,7 @@ const UploadFile = ({ multiple, onFinish }) => {
   }
 
   const handleChange = (e) => {
-    console.log('>>>', e.target.files);
+    console.log('>>> change', e.target.files);
 
     const fileList = e.target.files;
 
@@ -97,9 +99,19 @@ const UploadFile = ({ multiple, onFinish }) => {
 
   return (
     <div className={s.root}>
-      <label className={s.dropZone}>
+      <label
+        className={s.dropZone}
+        onDragOver={(e) => e.nativeEvent.preventDefault()}
+        onDrop={(e) => {
+          console.log('>>> drop', e)
+          e.nativeEvent.preventDefault();
+          inputRef.current.files = e.nativeEvent.dataTransfer.files;
+          inputRef.current.dispatchEvent(new Event('change', { bubbles: true }));
+        }}
+      >
         <UploadIcon />
         <input
+          ref={inputRef}
           onChange={handleChange}
           type="file"
           multiple={multiple}
